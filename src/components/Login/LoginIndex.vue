@@ -5,15 +5,20 @@
                 <div class="description font-medium text-xl uppercase"></div>
             </div>
             <div class="col-12 p-6">
-                <Form @submit.prevent="onSubmit">
+                <form @submit.prevent="handleSubmit(!v$.$invalid)">
                     <div class="col-12 flex align-items-center justify-content-center">
                         <span class="p-float-label w-full">
-                            <InputText class="w-full" id="value" aria-describedby="text-error" />
-                            <ErrorMessage name="value" />
-
-                            <label for="value">
+                            <InputText v-model="v$.email.$model" class="w-full" id="email" aria-describedby="text-error" />
+                            <label for="email">
                                 Email
                             </label>
+                            <span v-if="v$.email.$error && submitted">
+                                <span id="email-error" v-for="(error, index) of v$.email.$errors" :key="index">
+                                    <small class="p-error">{{ error.$message }}</small>
+                                </span>
+                            </span>
+                            <small v-else-if="(v$.email.$invalid && submitted) || v$.email.$pending.$response"
+                                class="p-error">{{ v$.email.required.$message.replace('Value', 'Email') }}</small>
                         </span>
                     </div>
                     <div class="col-12 flex align-items-center justify-content-center">
@@ -27,31 +32,51 @@
                     <div class="col-12 flex align-items-center justify-content-center">
                         <ButtonComponent class="w-full" type="submit" label="ENTRAR" :disabled="false" />
                     </div>
-                </Form>
+                </form>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import { Form, ErrorMessage } from 'vee-validate';
-
+import { email, required, helpers } from "@vuelidate/validators";
+import { useVuelidate } from "@vuelidate/core";
 import ButtonComponent from 'primevue/button';
 import InputText from 'primevue/inputtext';
-import Image from 'primevue/image';
 
 export default {
-    name: 'LoginIndex',
+    setup: () => ({ v$: useVuelidate() }),
     components: {
         ButtonComponent,
         InputText,
-        Image,
-        Form,
+    },
+    data() {
+        return {
+            email: '',
+            password: '',
+            submitted: false,
+        }
+    },
+    validations() {
+        return {
+            email: {
+                required: helpers.withMessage("Email é obrigatório!", required),
+                email: helpers.withMessage('messages.INVALID_MAIL', email)
+            },
+            password: {
+                required: helpers.withMessage('messages.REQUIRED', required),
+            },
+        }
     },
     methods: {
-        onSubmit() {
-            console.log('Submitted');
-        },
+        async handleSubmit(isFormValid) {
+            this.submitted = true;
+
+            console.log(isFormValid)
+            if (!isFormValid) {
+                return;
+            }
+        }
     },
 }
 </script>
