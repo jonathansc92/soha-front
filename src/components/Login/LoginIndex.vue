@@ -30,7 +30,7 @@
                     </div>
                     <div class="field col-12">
                         <label for="password">
-                            Senha {{ v$.$errors.length }} {{ v$.$dirty }}
+                            Senha
                         </label>
                         <InputText v-model="v$.form.password.$model" class="w-full"
                             :class="{ 'p-invalid': v$.form.password.$invalid }" id="password" aria-describedby="text-error"
