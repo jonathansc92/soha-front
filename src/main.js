@@ -1,5 +1,5 @@
 //theme
-import "primevue/resources/themes/md-light-indigo/theme.css";     
+import '@/assets/themes/material/material-light/standard/indigo/theme.scss';
     
 //core
 import "primevue/resources/primevue.min.css";

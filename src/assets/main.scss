@@ -3,3 +3,14 @@
 body {
   font-family: "Roboto";
 }
+
+.soha-logo {
+  content: '';
+  background: url(http://www.soha.com.br/images/icone-roxo.svg) no-repeat center left;
+  background-size: 24px 24px;
+  padding-left: 30px;
+
+  &.secondary {
+    filter: brightness(0) invert(1);
+  }
+}

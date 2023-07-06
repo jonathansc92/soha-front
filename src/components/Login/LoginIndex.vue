@@ -1,45 +1,68 @@
 <template>
     <div class="grid login background h-screen">
-        <div class="container border-round flex align-content-center justify-content-center flex-wrap">
-            <div class="col-12 text-center">
-                <div class="description font-medium text-xl uppercase"></div>
+        <div class="col-8 flex align-content-center flex-wrap sm:hidden md:hidden lg:inline-flex">
+            <div class="col-12 flex align-items-center justify-content-center">
+                <div class="soha-logo secondary font-medium text-xl uppercase">
+                    SOHA
+                </div>
+            </div>
+        </div>
+        <div class="col-12 lg:col-4 xl:col-4 container flex align-content-center justify-content-center flex-wrap">
+            <div class="soha-logo font-medium text-xl uppercase title">
+                Login
             </div>
             <div class="col-12 p-6">
-                <form @submit.prevent="handleSubmit(!v$.$invalid)">
-                    <div class="col-12 flex align-items-center justify-content-center">
-                        <span class="p-float-label w-full">
-                            <InputText v-model="v$.email.$model" class="w-full" id="email" aria-describedby="text-error" />
-                            <label for="email">
-                                Email
-                            </label>
-                            <span v-if="v$.email.$error && submitted">
-                                <span id="email-error" v-for="(error, index) of v$.email.$errors" :key="index">
-                                    <small class="p-error">{{ error.$message }}</small>
-                                </span>
+                <form @submit.prevent="handleSubmit(!v$.$invalid)" class="formgrid grid">
+                    <div class="field col-12">
+                        <label for="email">
+                            Email
+                        </label>
+                        <InputText v-model="v$.form.email.$model" class="w-full"
+                            :class="{ 'p-invalid': v$.form.email.$invalid }" id="email" aria-describedby="text-error"
+                            placeholder="Digite seu email" />
+                        <span v-if="v$.form.email.$error">
+                            <span id="email-error" v-for="(error, index) of v$.form.email.$errors" :key="index">
+                                <small class="p-error">{{ error.$message }}</small>
                             </span>
-                            <small v-else-if="(v$.email.$invalid && submitted) || v$.email.$pending.$response"
-                                class="p-error">{{ v$.email.required.$message.replace('Value', 'Email') }}</small>
                         </span>
+                        <small v-else-if="(v$.form.email.$invalid) || v$.form.email.$pending.$response"
+                            class="p-error">{{ v$.form.email.required.$message.replace('Value', 'Email') }}</small>
+                    </div>
+                    <div class="field col-12">
+                        <label for="password">
+                            Senha {{ v$.$errors.length }} {{ v$.$dirty }}
+                        </label>
+                        <InputText v-model="v$.form.password.$model" class="w-full"
+                            :class="{ 'p-invalid': v$.form.password.$invalid }" id="password" aria-describedby="text-error"
+                            placeholder="Digite sua senha" type="password" />
+                        <span v-if="v$.form.password.$error">
+                            <span id="password-error" v-for="(error, index) of v$.form.password.$errors" :key="index">
+                                <small class="p-error">{{ error.$message }}</small>
+                            </span>
+                        </span>
+                        <small v-else-if="(v$.form.password.$invalid) || v$.form.password.$pending.$response"
+                            class="p-error">{{ v$.form.password.required.$message.replace('Value', 'Password')
+                            }}</small>
                     </div>
                     <div class="col-12 flex align-items-center justify-content-center">
-                        <span class="p-float-label w-full">
-                            <InputText class="w-full" id="value" aria-describedby="text-error" />
-                            <label for="value">
-                                Senha
-                            </label>
-                        </span>
-                    </div>
-                    <div class="col-12 flex align-items-center justify-content-center">
-                        <ButtonComponent class="w-full" type="submit" label="ENTRAR" :disabled="false" />
+                        <ButtonComponent class="w-full" type="submit" label="ENTRAR"
+                            :disabled="v$.$invalid" :loading="loading" outlined />
                     </div>
                 </form>
+                <div class="col-12">
+                    <small>
+                        usuário <span class="font-italic font-bold">teste@soha.com</span> e senha <span
+                            class="font-italic font-bold">soha123</span>
+                    </small>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import { email, required, helpers } from "@vuelidate/validators";
+import { ref } from "vue";
+import { email, required, helpers, minLength, maxLength } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
 import ButtonComponent from 'primevue/button';
 import InputText from 'primevue/inputtext';
@@ -52,28 +75,37 @@ export default {
     },
     data() {
         return {
-            email: '',
-            password: '',
-            submitted: false,
+            form: {
+                email: ref(null),
+                password: ref(null),
+            },
+            submitted: ref(false),
+            disabled: ref(true),
+            loading: ref(false),
         }
     },
     validations() {
         return {
-            email: {
-                required: helpers.withMessage("Email é obrigatório!", required),
-                email: helpers.withMessage('messages.INVALID_MAIL', email)
-            },
-            password: {
-                required: helpers.withMessage('messages.REQUIRED', required),
-            },
+            form: {
+                email: {
+                    required: helpers.withMessage('Campo obrigatório', required),
+                    email: helpers.withMessage('Formato inválido', email)
+                },
+                password: {
+                    required: helpers.withMessage('Campo obrigatório', required),
+                    minLength: helpers.withMessage('Número minímo de caracteres 4', minLength(4)),
+                    maxLength: helpers.withMessage('Número máximo de caracteres 15', maxLength(15)),
+                },
+            }
         }
     },
     methods: {
         async handleSubmit(isFormValid) {
             this.submitted = true;
+            // this.loading = true;
 
-            console.log(isFormValid)
             if (!isFormValid) {
+                this.disabled = true;
                 return;
             }
         }
@@ -87,24 +119,12 @@ export default {
         background-color: var(--color-primary);
     }
 
-    .container {
-        background: var(--color-white) none repeat scroll 0 0;
-        margin: 133px auto 129px;
-    }
-
-    .logo {
-        margin-right: 5px;
-    }
-
-    .description {
+    .title {
         color: var(--color-primary);
     }
 
-    .description::after {
-        content: 'SOHA - LOGIN';
-        background: url(http://www.soha.com.br/images/icone-roxo.svg) no-repeat center left;
-        background-size: 24px 24px;
-        padding-left: 30px;
+    .container {
+        background: var(--color-white) none repeat scroll 0 0;
     }
 }
 </style>
