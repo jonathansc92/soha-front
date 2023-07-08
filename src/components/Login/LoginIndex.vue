@@ -25,8 +25,8 @@
                                 <small class="p-error">{{ error.$message }}</small>
                             </span>
                         </span>
-                        <small v-else-if="(v$.form.email.$invalid) || v$.form.email.$pending.$response"
-                            class="p-error">{{ v$.form.email.required.$message.replace('Value', 'Email') }}</small>
+                        <small v-else-if="(v$.form.email.$invalid) || v$.form.email.$pending.$response" class="p-error">{{
+                            v$.form.email.required.$message.replace('Value', 'Email') }}</small>
                     </div>
                     <div class="field col-12">
                         <label for="password">
@@ -45,13 +45,13 @@
                             }}</small>
                     </div>
                     <div class="col-12 flex align-items-center justify-content-center">
-                        <ButtonComponent class="w-full" type="submit" label="ENTRAR"
-                            :disabled="v$.$invalid" :loading="loading" outlined />
+                        <ButtonComponent class="w-full" type="submit" label="ENTRAR" :disabled="v$.$invalid"
+                            :loading="loading" outlined />
                     </div>
                 </form>
                 <div class="col-12">
                     <small>
-                        usuário <span class="font-italic font-bold">teste@soha.com</span> e senha <span
+                        usuário <span class="font-italic font-bold">soha@soha.com</span> e senha <span
                             class="font-italic font-bold">soha123</span>
                     </small>
                 </div>
@@ -66,6 +66,7 @@ import { email, required, helpers, minLength, maxLength } from "@vuelidate/valid
 import { useVuelidate } from "@vuelidate/core";
 import ButtonComponent from 'primevue/button';
 import InputText from 'primevue/inputtext';
+import { authStore } from "@/stores/Auth";
 
 export default {
     setup: () => ({ v$: useVuelidate() }),
@@ -82,6 +83,7 @@ export default {
             submitted: ref(false),
             disabled: ref(true),
             loading: ref(false),
+            store: authStore(),
         }
     },
     validations() {
@@ -102,12 +104,16 @@ export default {
     methods: {
         async handleSubmit(isFormValid) {
             this.submitted = true;
-            // this.loading = true;
-
+            this.loading = true;
+            
             if (!isFormValid) {
                 this.disabled = true;
+                this.loading = false;
                 return;
             }
+
+            await this.store.login(this.form);
+            this.loading = false;
         }
     },
 }

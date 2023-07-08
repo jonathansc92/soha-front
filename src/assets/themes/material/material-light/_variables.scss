@@ -688,7 +688,7 @@ $breadcrumbLastItemIconColor:$textSecondaryColor !default;
 $breadcrumbSeparatorColor:$textSecondaryColor !default;
 
 $horizontalMenuPadding:1rem !default;
-$horizontalMenuBg:transparent !default;
+$horizontalMenuBg: $primaryColor !default;
 $horizontalMenuBorder:1px solid #e5e5e5 !default;
 $horizontalMenuTextColor:$textColor !default;
 $horizontalMenuRootMenuitemPadding:1rem !default;
