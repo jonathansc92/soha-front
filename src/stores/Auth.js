@@ -1,20 +1,28 @@
+import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import { useToast } from "vue-toastification";
+import { useToast } from 'vue-toastification';
 import AuthService from '@/services/AuthService.js';
-import TokenService from "@/services/TokenService";
+import TokenService from '@/services/TokenService';
+import MeService from '../services/MeService';
 
 const toastr = useToast();
 
-export const authStore = defineStore("authStore", {
+export const authStore = defineStore('authStore', {
     id: 'authStore',
-    state: () => ({}),
-    getters: {},
+    state: () => ({
+        me: ref(null),
+    }),
+    getters: {
+        getMe() {
+            return this.me;
+        },
+    },
     actions: {
         async login(data) {
-
             await AuthService.login(data).then(async response => {
-                TokenService.setToken(response.data);
-                console.log(TokenService.getLocalAccessToken())
+                TokenService.setToken(response.data.token);
+                MeService.setUser(response.data.user);
+
                 toastr.success(response.data.message);
 
                 this.router.push('/');
@@ -24,11 +32,18 @@ export const authStore = defineStore("authStore", {
             });
         },
         async logout() {
-            TokenService.removeToken();
+            await AuthService.logout().then(async response => {
+                TokenService.removeToken();
+                MeService.removeUser();
 
-            toastr.success("Sessão encerrada com sucesso!");
+                toastr.success(response.data.message);
 
-            this.router.push('/login');
+                this.router.push('/login');
+            }).catch(async () => {
+                TokenService.removeToken();
+                MeService.removeUser();
+                this.router.push('/login');
+            });
         },
     },
 })
