@@ -7,7 +7,7 @@ const setup = () => {
         httpCommon[instance].interceptors.request.use(
             (config) => {
                 config.headers["Content-Type"] = "application/json";
-                // TokenService.remove();
+
                 if (config.url !== '/api/auth/login') {
                     const token = TokenService.getLocalAccessToken();
 
