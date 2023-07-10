@@ -27,7 +27,12 @@ export const authStore = defineStore('authStore', {
 
                 this.router.push('/');
             }).catch(async (error) => {
-                toastr.error(error.response.data.message);
+                if (error.status === 400) {
+                    toastr.error(error.response.data.message);
+                }
+                else {
+                    toastr.error("Erro interno, contate o administrador!");
+                }
                 this.router.push('/login');
             });
         },
