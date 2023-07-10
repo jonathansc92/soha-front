@@ -27,7 +27,7 @@ export const authStore = defineStore('authStore', {
 
                 this.router.push('/');
             }).catch(async (error) => {
-                if (error.status === 400) {
+                if (error.response.status === 400) {
                     toastr.error(error.response.data.message);
                 }
                 else {
