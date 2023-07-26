@@ -1,3 +1,3 @@
-FROM node:lts
+FROM node:alpine
 
 WORKDIR /app
